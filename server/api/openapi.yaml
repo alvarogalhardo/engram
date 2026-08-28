@@ -1,0 +1,30 @@
+openapi: "3.0.3"
+info:
+  title: engram API
+  version: "0.1.0"
+  description: |
+    Sync server for the engram flashcards app.
+    Only /healthz exists today — the /v1 surface (decks, cards, sync) is
+    specified in docs/sync-protocol.md and in the skipped tests under
+    server/internal/api/, and gets documented here as it is implemented
+    (issue M1: "OpenAPI for all M1 endpoints").
+paths:
+  /healthz:
+    get:
+      summary: Liveness/readiness probe (public, no auth)
+      responses:
+        "200":
+          description: Server is up; db reports connectivity
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status: { type: string, enum: [ok] }
+                  db: { type: string, enum: [ok, down] }
+components:
+  securitySchemes:
+    bearer:
+      type: http
+      scheme: bearer
+      description: Static token until M3 (see ADR-0005), then session tokens.

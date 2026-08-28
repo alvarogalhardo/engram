@@ -1,0 +1,19 @@
+# Gradle
+.gradle/
+build/
+app/build/
+.kotlin/
+
+# Config local (aponta o SDK desta máquina; CI usa ANDROID_HOME)
+local.properties
+
+# IDE
+.idea/
+*.iml
+captures/
+.cxx/
+
+*.jks
+
+# gerado
+tools/fixture.apkg

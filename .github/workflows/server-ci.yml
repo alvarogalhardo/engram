@@ -1,0 +1,59 @@
+name: server-ci
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'server/**'
+      - 'docker-compose.yml'
+      - '.github/workflows/server-ci.yml'
+  # PRs sempre rodam (sem path filter) para não travar required checks.
+  pull_request:
+
+jobs:
+  server:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: server
+    services:
+      postgres:
+        image: postgres:16-alpine
+        env:
+          POSTGRES_USER: engram
+          POSTGRES_PASSWORD: engram
+          POSTGRES_DB: engram_test
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U engram"
+          --health-interval 5s
+          --health-timeout 3s
+          --health-retries 10
+    env:
+      DATABASE_URL: postgres://engram:engram@localhost:5432/engram_test?sslmode=disable
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-go@v5
+        with:
+          go-version: stable
+          cache-dependency-path: server/go.sum
+
+      - name: Lint
+        uses: golangci/golangci-lint-action@v8
+        with:
+          working-directory: server
+
+      - name: Test (race)
+        run: go test -race ./...
+
+      - name: Build
+        run: CGO_ENABLED=0 go build ./...
+
+      - name: Docker build
+        run: docker build -t engram-server .
+
+      - name: Compose config válido
+        working-directory: .
+        run: docker compose config -q

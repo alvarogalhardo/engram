@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="108dp"
+    android:height="108dp"
+    android:viewportWidth="108"
+    android:viewportHeight="108">
+    <!-- carta de trás, levemente rotacionada -->
+    <path
+        android:fillColor="#B3FFFFFF"
+        android:pathData="M38,32 m4,-2 l30,5 a4,4 0 0 1 3.3,4.6 l-5,30 a4,4 0 0 1 -4.6,3.3 l-30,-5 a4,4 0 0 1 -3.3,-4.6 l5,-30 a4,4 0 0 1 4.6,-3.3 z" />
+    <!-- carta da frente -->
+    <path
+        android:fillColor="#FFFFFFFF"
+        android:pathData="M40,38 h28 a4,4 0 0 1 4,4 v28 a4,4 0 0 1 -4,4 h-28 a4,4 0 0 1 -4,-4 v-28 a4,4 0 0 1 4,-4 z" />
+    <!-- linhas de texto da carta -->
+    <path
+        android:fillColor="#1A73E8"
+        android:pathData="M44,48 h20 v3 h-20 z M44,55 h20 v3 h-20 z M44,62 h12 v3 h-12 z" />
+</vector>

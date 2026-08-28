@@ -1,0 +1,33 @@
+# --- segredos: NUNCA commitados (sem exceções neste repo) ---
+*.jks
+*.keystore
+.env
+.env.*
+!.env.example
+
+# --- Android/Gradle ---
+.gradle/
+build/
+android/app/build/
+android/local.properties
+.kotlin/
+captures/
+.cxx/
+
+# --- Go ---
+server/bin/
+*.test
+coverage.out
+
+# --- Terraform ---
+.terraform/
+*.tfstate
+*.tfstate.*
+*.tfvars
+!*.auto.tfvars.example
+
+# --- IDE/SO ---
+.idea/
+*.iml
+.vscode/
+.DS_Store
