@@ -8,6 +8,7 @@ on:
       - '.github/workflows/android-ci.yml'
   # PRs sempre rodam (sem path filter) para não travar required checks.
   pull_request:
+  workflow_dispatch:
 
 jobs:
   android:
