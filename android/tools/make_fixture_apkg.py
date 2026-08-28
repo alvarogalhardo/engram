@@ -1,9 +1,9 @@
 #!/usr/bin/env python3
-"""Gera um .apkg mínimo (formato legado do Anki) para testar o import do app.
+"""Build a minimal .apkg (legacy Anki format) to exercise the app's importer.
 
-Uso: python3 tools/make_fixture_apkg.py [saida.apkg]
-Cria 3 notas (básica, HTML com imagem, cloze) e 1 imagem de mídia,
-depois reabre o pacote e valida o próprio conteúdo (self-check).
+Usage: python3 tools/make_fixture_apkg.py [output.apkg]
+Creates 3 notes (basic, HTML with an image, cloze) and 1 media file, then
+reopens the package and validates its own content (self-check).
 """
 import base64
 import json
@@ -15,7 +15,7 @@ from pathlib import Path
 
 SEP = "\x1f"
 
-# PNG 1x1 azul
+# 1x1 blue PNG
 PIXEL_PNG = base64.b64decode(
     "iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR4nGNgYPj/HwADAgH/"
     "qY5dBwAAAABJRU5ErkJggg=="
@@ -36,13 +36,13 @@ MODELS = {
 
 DECKS = {
     "1": {"name": "Default"},
-    "1234": {"name": "Deck de Teste"},
+    "1234": {"name": "Test Deck"},
 }
 
 NOTES = [
-    (1, 1111, f"O que é DNS?{SEP}Sistema de nomes de domínio"),
-    (2, 1111, f'<b>Imagem:</b> <img src="pixel.png">{SEP}Verso com <i>HTML</i>'),
-    (3, 2222, f"A capital do Brasil é {{{{c1::Brasília}}}}{SEP}Nota extra"),
+    (1, 1111, f"What is DNS?{SEP}The domain name system"),
+    (2, 1111, f'<b>Image:</b> <img src="pixel.png">{SEP}Back with <i>HTML</i>'),
+    (3, 2222, f"The capital of Brazil is {{{{c1::Brasília}}}}{SEP}Extra note"),
 ]
 
 
@@ -107,7 +107,7 @@ def self_check(path: Path) -> None:
         assert 'src="pixel.png"' in flds[1]
         assert "{{c1::" in flds[2]
         con.close()
-    print(f"OK: {path} ({path.stat().st_size} bytes, 3 notas, 1 mídia)")
+    print(f"OK: {path} ({path.stat().st_size} bytes, 3 notes, 1 media file)")
 
 
 if __name__ == "__main__":

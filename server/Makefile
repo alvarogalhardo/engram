@@ -21,6 +21,6 @@ build:
 docker-build:
 	docker build -t engram-server .
 
-# Migrations são arquivos NNNN_nome.{up,down}.sql em ./migrations,
-# aplicadas automaticamente no startup do servidor (store.Migrate).
-# Para criar uma nova: copie a numeração seguinte, escreva up e down.
+# Migrations are NNNN_name.{up,down}.sql files under ./migrations, applied
+# automatically when the server starts (store.Migrate).
+# To add one: take the next number and write both the up and the down file.

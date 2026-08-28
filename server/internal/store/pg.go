@@ -10,18 +10,18 @@ import (
 	pgxmigrate "github.com/golang-migrate/migrate/v4/database/pgx/v5"
 	"github.com/golang-migrate/migrate/v4/source/iofs"
 	"github.com/jackc/pgx/v5/pgxpool"
-	_ "github.com/jackc/pgx/v5/stdlib" // driver database/sql "pgx" (usado só pelas migrations)
+	_ "github.com/jackc/pgx/v5/stdlib" // database/sql "pgx" driver (used only by the migrations)
 
 	"github.com/alvarogalhardo/engram/server/migrations"
 )
 
-// Store detém o pool de conexões com o Postgres.
+// Store holds the Postgres connection pool.
 type Store struct {
 	Pool *pgxpool.Pool
 	url  string
 }
 
-// Open conecta ao banco e valida a conexão com um ping.
+// Open connects to the database and validates the connection with a ping.
 func Open(ctx context.Context, databaseURL string) (*Store, error) {
 	pool, err := pgxpool.New(ctx, databaseURL)
 	if err != nil {
@@ -36,7 +36,7 @@ func Open(ctx context.Context, databaseURL string) (*Store, error) {
 	return &Store{Pool: pool, url: databaseURL}, nil
 }
 
-// Migrate aplica as migrations embarcadas (server/migrations) no startup.
+// Migrate applies the embedded migrations (server/migrations) on startup.
 func (s *Store) Migrate() error {
 	src, err := iofs.New(migrations.FS, ".")
 	if err != nil {
@@ -61,7 +61,7 @@ func (s *Store) Migrate() error {
 	return nil
 }
 
-// Close libera o pool de conexões.
+// Close releases the connection pool.
 func (s *Store) Close() {
 	s.Pool.Close()
 }

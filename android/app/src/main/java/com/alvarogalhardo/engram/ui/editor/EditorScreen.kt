@@ -59,7 +59,7 @@ class EditorViewModel(
     var loaded by mutableStateOf(false)
         private set
 
-    /** Cartas criadas no app são editadas em Markdown; importadas, em HTML cru. */
+    /** Cards authored in the app are edited as Markdown; imported ones as raw HTML. */
     val isMarkdown: Boolean
         get() = card?.let { it.frontSrc != null } ?: true
 

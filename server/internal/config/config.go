@@ -1,16 +1,16 @@
-// Package config carrega a configuração do servidor a partir de variáveis de
-// ambiente. Load recebe a função de lookup para ser testável sem tocar no
-// ambiente real (referência de injeção de dependência barata em Go).
+// Package config loads the server configuration from environment variables.
+// Load takes the lookup function as an argument so it can be tested without
+// touching the real environment (cheap dependency injection, Go style).
 package config
 
-// Config é a configuração completa do servidor.
+// Config is the full server configuration.
 type Config struct {
 	Port        string
 	DatabaseURL string
 	APIToken    string
 }
 
-// Load lê a configuração usando a função de lookup fornecida (os.Getenv em produção).
+// Load reads the configuration using the given lookup function (os.Getenv in production).
 func Load(getenv func(string) string) Config {
 	return Config{
 		Port:        orDefault(getenv("PORT"), "8080"),

@@ -84,7 +84,7 @@ class ApkgImporter(
                             front = it.front,
                             back = it.back,
                             state = CardState.NEW,
-                            dueAt = now + it.order, // preserva a ordem de intake
+                            dueAt = now + it.order, // preserve intake order
                             createdAt = now + it.order,
                         )
                     }
@@ -106,7 +106,7 @@ class ApkgImporter(
                 for (entry in zip.entries()) {
                     if (entry.isDirectory) continue
                     val out = File(destDir, entry.name)
-                    // guarda contra zip-slip
+                    // zip-slip guard
                     if (!out.canonicalPath.startsWith(destDir.canonicalPath + File.separator)) continue
                     out.parentFile?.mkdirs()
                     zip.getInputStream(entry).use { input ->
@@ -153,7 +153,7 @@ class ApkgImporter(
         }
     }
 
-    /** Copia a mídia numerada do zip para filesDir/media, resolvendo colisões por SHA-1. */
+    /** Copies the numbered media from the zip into filesDir/media, resolving collisions by SHA-1. */
     private fun copyMedia(extractDir: File, warnings: MutableList<String>): Map<String, String> {
         val mediaJson = File(extractDir, "media")
         if (!mediaJson.exists()) return emptyMap()
@@ -172,14 +172,14 @@ class ApkgImporter(
                 missing++
                 continue
             }
-            val safeName = File(originalName).name // descarta qualquer caminho embutido
+            val safeName = File(originalName).name // drop any embedded path
             val target = File(mediaFiles.dir, safeName)
             val finalName = when {
                 !target.exists() -> {
                     source.copyTo(target)
                     safeName
                 }
-                sha1(target) == sha1(source) -> safeName // mesmo conteúdo, reusa
+                sha1(target) == sha1(source) -> safeName // same content, reuse it
                 else -> {
                     val renamed = "${sha1(source).substring(0, 8)}-$safeName"
                     val renamedFile = File(mediaFiles.dir, renamed)

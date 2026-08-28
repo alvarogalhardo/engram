@@ -6,7 +6,7 @@ on:
     paths:
       - 'android/**'
       - '.github/workflows/android-ci.yml'
-  # PRs sempre rodam (sem path filter) para não travar required checks.
+  # PRs always run (no path filter) so required checks never get stuck.
   pull_request:
   workflow_dispatch:
 
@@ -26,5 +26,5 @@ jobs:
 
       - uses: gradle/actions/setup-gradle@v4
 
-      - name: Testes + APK debug
+      - name: Unit tests + debug APK
         run: ./gradlew --no-daemon test assembleDebug

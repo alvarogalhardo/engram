@@ -15,9 +15,9 @@ import androidx.webkit.WebViewAssetLoader
 import java.io.File
 
 /**
- * Renderiza o HTML de uma carta num WebView (JS desligado, sem acesso a arquivos).
- * Imagens em filesDir/media são servidas via WebViewAssetLoader, então
- * `<img src="foo.png">` do Anki resolve direto pela BASE_URL relativa.
+ * Renders a card's HTML in a WebView (JavaScript off, no file access).
+ * Images under filesDir/media are served through WebViewAssetLoader, so Anki's
+ * `<img src="foo.png">` resolves directly against the relative BASE_URL.
  */
 @Composable
 fun CardRenderer(html: String, modifier: Modifier = Modifier) {
@@ -55,7 +55,7 @@ fun CardRenderer(html: String, modifier: Modifier = Modifier) {
                     override fun shouldOverrideUrlLoading(
                         view: WebView,
                         request: WebResourceRequest,
-                    ): Boolean = true // bloqueia navegação para fora da carta
+                    ): Boolean = true // block navigation away from the card
                 }
             }
         },

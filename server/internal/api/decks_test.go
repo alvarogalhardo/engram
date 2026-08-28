@@ -2,14 +2,15 @@ package api
 
 import "testing"
 
-// Spec da issue M1 "Decks CRUD" — contrato em api/openapi.yaml + docs/sync-protocol.md §2.
-// Formatos esperados:
-//   deck JSON: {"id": "<uuid>", "name": "...", "createdAt": <ms>, "updatedAt": <ms>, "deleted": false}
-//   POST /v1/decks {"name": "..."}            -> 201 + deck
-//   GET /v1/decks                              -> 200 + lista (sem tombstones)
-//   GET /v1/decks/{id}                         -> 200 | 404 (inclusive para tombstone)
-//   PUT /v1/decks/{id} {"name": "..."}         -> 200 + deck atualizado (updatedAt novo)
-//   DELETE /v1/decks/{id}                      -> 204 (tombstone, nunca apaga a linha)
+// Spec for the M1 issue "Decks CRUD" — contract in api/openapi.yaml and
+// docs/sync-protocol.md §2. Expected shapes:
+//
+//	deck JSON: {"id": "<uuid>", "name": "...", "createdAt": <ms>, "updatedAt": <ms>, "deleted": false}
+//	POST /v1/decks {"name": "..."}      -> 201 + deck
+//	GET /v1/decks                        -> 200 + list (tombstones excluded)
+//	GET /v1/decks/{id}                   -> 200 | 404 (404 for tombstones too)
+//	PUT /v1/decks/{id} {"name": "..."}   -> 200 + updated deck (fresh updatedAt)
+//	DELETE /v1/decks/{id}                -> 204 (tombstone; never deletes the row)
 
 type deckJSON struct {
 	ID        string `json:"id"`
@@ -20,14 +21,14 @@ type deckJSON struct {
 }
 
 func TestDeckCreateAndGet(t *testing.T) {
-	t.Skip("un-skip na issue M1: Decks CRUD (docs/roadmap.md)")
+	t.Skip("un-skip in M1 issue: decks CRUD (docs/roadmap.md)")
 	s := newSpecServer(t)
 
 	rec := doJSON(t, s, "POST", "/v1/decks", specToken, map[string]string{"name": "Go"})
 	wantStatus(t, rec, 201)
 	created := decode[deckJSON](t, rec)
 	if created.ID == "" || created.Name != "Go" {
-		t.Fatalf("deck criado inválido: %+v", created)
+		t.Fatalf("invalid created deck: %+v", created)
 	}
 
 	rec = doJSON(t, s, "GET", "/v1/decks/"+created.ID, specToken, nil)
@@ -35,14 +36,14 @@ func TestDeckCreateAndGet(t *testing.T) {
 }
 
 func TestDeckCreateRejectsBlankName(t *testing.T) {
-	t.Skip("un-skip na issue M1: Decks CRUD (docs/roadmap.md)")
+	t.Skip("un-skip in M1 issue: decks CRUD (docs/roadmap.md)")
 	s := newSpecServer(t)
 	rec := doJSON(t, s, "POST", "/v1/decks", specToken, map[string]string{"name": "  "})
 	wantStatus(t, rec, 422)
 }
 
 func TestDeckListExcludesTombstones(t *testing.T) {
-	t.Skip("un-skip na issue M1: Decks CRUD (docs/roadmap.md)")
+	t.Skip("un-skip in M1 issue: decks CRUD (docs/roadmap.md)")
 	s := newSpecServer(t)
 
 	a := decode[deckJSON](t, doJSON(t, s, "POST", "/v1/decks", specToken, map[string]string{"name": "A"}))
@@ -52,16 +53,16 @@ func TestDeckListExcludesTombstones(t *testing.T) {
 
 	list := decode[[]deckJSON](t, doJSON(t, s, "GET", "/v1/decks", specToken, nil))
 	if len(list) != 1 || list[0].Name != "B" {
-		t.Fatalf("lista deveria conter só B, veio: %+v", list)
+		t.Fatalf("list should contain only B, got: %+v", list)
 	}
 
-	// Tombstone: GET individual retorna 404, mas a linha continua no banco
-	// (o sync do M2 precisa dela para propagar a deleção).
+	// Tombstone: the individual GET returns 404, but the row stays in the
+	// database — M2's sync needs it to propagate the deletion.
 	wantStatus(t, doJSON(t, s, "GET", "/v1/decks/"+a.ID, specToken, nil), 404)
 }
 
 func TestDeckRenameBumpsUpdatedAt(t *testing.T) {
-	t.Skip("un-skip na issue M1: Decks CRUD (docs/roadmap.md)")
+	t.Skip("un-skip in M1 issue: decks CRUD (docs/roadmap.md)")
 	s := newSpecServer(t)
 
 	created := decode[deckJSON](t, doJSON(t, s, "POST", "/v1/decks", specToken, map[string]string{"name": "old"}))
@@ -69,12 +70,12 @@ func TestDeckRenameBumpsUpdatedAt(t *testing.T) {
 	wantStatus(t, rec, 200)
 	updated := decode[deckJSON](t, rec)
 	if updated.Name != "new" || updated.UpdatedAt < created.UpdatedAt {
-		t.Fatalf("rename não refletido: %+v (antes %+v)", updated, created)
+		t.Fatalf("rename not reflected: %+v (was %+v)", updated, created)
 	}
 }
 
 func TestDeckNotFound(t *testing.T) {
-	t.Skip("un-skip na issue M1: Decks CRUD (docs/roadmap.md)")
+	t.Skip("un-skip in M1 issue: decks CRUD (docs/roadmap.md)")
 	s := newSpecServer(t)
 	wantStatus(t, doJSON(t, s, "GET", "/v1/decks/00000000-0000-0000-0000-0000000000ff", specToken, nil), 404)
 }

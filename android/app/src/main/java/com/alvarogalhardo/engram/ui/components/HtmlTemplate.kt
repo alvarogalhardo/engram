@@ -3,7 +3,7 @@ package com.alvarogalhardo.engram.ui.components
 object HtmlTemplate {
     const val BASE_URL = "https://appassets.androidapp.com/media/"
 
-    /** Embrulha o HTML da carta com CSS theme-aware (cores vêm do MaterialTheme). */
+    /** Wraps the card HTML with theme-aware CSS (colors come from MaterialTheme). */
     fun wrap(body: String, textColor: String, codeBg: String, outline: String, primary: String): String = """
         <!doctype html>
         <html>

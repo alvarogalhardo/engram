@@ -21,16 +21,16 @@ import com.alvarogalhardo.engram.domain.scheduler.CardState
 data class Card(
     @PrimaryKey(autoGenerate = true) val id: Long = 0,
     val deckId: Long,
-    /** Conteúdo renderizável, sempre HTML. */
+    /** Renderable content, always HTML. */
     val front: String,
     val back: String,
-    /** Fonte em Markdown para cartas criadas no app; null para importadas (editadas como HTML cru). */
+    /** Markdown source for cards authored in the app; null for imported ones (edited as raw HTML). */
     val frontSrc: String? = null,
     val backSrc: String? = null,
     val state: Int = CardState.NEW,
     val stepIndex: Int = 0,
     val intervalDays: Int = 0,
-    /** Fator de facilidade em permile (2500 = 250%). */
+    /** Ease factor in permille (2500 = 250%). */
     val easeFactor: Int = 2500,
     val repetitions: Int = 0,
     val lapses: Int = 0,

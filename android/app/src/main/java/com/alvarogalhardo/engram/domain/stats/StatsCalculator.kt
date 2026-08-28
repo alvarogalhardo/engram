@@ -11,7 +11,7 @@ data class DayCount(val date: LocalDate, val count: Int)
 data class StatsResult(
     val last30Days: List<DayCount>,
     val streakDays: Int,
-    /** Fração de respostas != Errei; null se não houver revisões no período. */
+    /** Fraction of answers that were not Again; null when there are no reviews in the window. */
     val accuracy30: Double?,
     val accuracyAll: Double?,
     val totalReviews: Int,
@@ -26,8 +26,8 @@ object StatsCalculator {
             DayCount(date, byDay[date]?.size ?: 0)
         }
 
-        // Streak: dias consecutivos com >= 1 revisão, terminando hoje
-        // (ou ontem, se hoje ainda não estudou — o streak ainda não quebrou).
+        // Streak: consecutive days with >= 1 review, ending today (or yesterday,
+        // when today has no reviews yet — the streak has not broken).
         var streak = 0
         var cursor = if (byDay.containsKey(today)) today else today.minusDays(1)
         while (byDay.containsKey(cursor)) {

@@ -13,9 +13,9 @@ import (
 	"github.com/alvarogalhardo/engram/server/internal/store"
 )
 
-// Helpers dos testes de spec (M1/M2). Estes testes rodam contra Postgres real:
-// exporte DATABASE_URL (docker compose up postgres) e remova o t.Skip da issue
-// que você estiver implementando.
+// Helpers for the spec tests (M1/M2). These run against a real Postgres:
+// export DATABASE_URL (docker compose up postgres) and remove the t.Skip of
+// whichever issue you are implementing.
 
 const specToken = "spec-test-token"
 
@@ -23,18 +23,18 @@ func newSpecServer(t *testing.T) *Server {
 	t.Helper()
 	dbURL := os.Getenv("DATABASE_URL")
 	if dbURL == "" {
-		t.Skip("DATABASE_URL não definido — testes de spec precisam de Postgres")
+		t.Skip("DATABASE_URL not set — the spec tests need Postgres")
 	}
 	st, err := store.Open(context.Background(), dbURL)
 	if err != nil {
-		t.Fatalf("abrindo store: %v", err)
+		t.Fatalf("opening store: %v", err)
 	}
 	t.Cleanup(st.Close)
 	if err := st.Migrate(); err != nil {
 		t.Fatalf("migrations: %v", err)
 	}
-	// Limpa dados entre testes; ignora erro enquanto as tabelas da migration
-	// 0002 (issue M1) ainda não existem.
+	// Wipe data between tests; the error is ignored while the tables from
+	// migration 0002 (issue M1) do not exist yet.
 	_, _ = st.Pool.Exec(context.Background(),
 		`TRUNCATE review_logs, cards, decks RESTART IDENTITY CASCADE`)
 	return New(config.Config{Port: "0", DatabaseURL: dbURL, APIToken: specToken}, st)
@@ -62,7 +62,7 @@ func decode[T any](t *testing.T, rec *httptest.ResponseRecorder) T {
 	t.Helper()
 	var v T
 	if err := json.Unmarshal(rec.Body.Bytes(), &v); err != nil {
-		t.Fatalf("resposta não é JSON válido (%d): %s", rec.Code, rec.Body.String())
+		t.Fatalf("response is not valid JSON (%d): %s", rec.Code, rec.Body.String())
 	}
 	return v
 }
@@ -74,4 +74,4 @@ func wantStatus(t *testing.T, rec *httptest.ResponseRecorder, want int) {
 	}
 }
 
-var _ = http.StatusOK // mantém o import estável enquanto os testes estão pulados
+var _ = http.StatusOK // keeps the import stable while the tests are skipped

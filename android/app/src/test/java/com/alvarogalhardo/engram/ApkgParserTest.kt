@@ -15,7 +15,7 @@ class ApkgParserTest {
     """.trimIndent()
 
     @Test
-    fun `parseia modelos com tipo e campos`() {
+    fun `parses models with type and fields`() {
         val models = ApkgParser.parseModels(modelsJson)
         assertEquals(2, models.size)
         assertFalse(models.getValue(1111L).isCloze)
@@ -25,25 +25,25 @@ class ApkgParserTest {
     }
 
     @Test
-    fun `nome do baralho ignora o Default do Anki`() {
+    fun `deck name skips Anki's Default`() {
         val json = """{"1": {"name": "Default"}, "1234": {"name": "Meu Deck"}}"""
         assertEquals("Meu Deck", ApkgParser.parseDeckName(json))
     }
 
     @Test
-    fun `se so existe Default usa Default mesmo`() {
+    fun `falls back to Default when it is the only deck`() {
         val json = """{"1": {"name": "Default"}}"""
         assertEquals("Default", ApkgParser.parseDeckName(json))
     }
 
     @Test
-    fun `parseia mapa de midia`() {
+    fun `parses the media map`() {
         val map = ApkgParser.parseMediaMap("""{"0": "a.png", "1": "b.jpg"}""")
         assertEquals(mapOf("0" to "a.png", "1" to "b.jpg"), map)
     }
 
     @Test
-    fun `mapa de midia vazio ou em branco`() {
+    fun `empty or blank media map`() {
         assertEquals(emptyMap<String, String>(), ApkgParser.parseMediaMap("{}"))
         assertEquals(emptyMap<String, String>(), ApkgParser.parseMediaMap(""))
     }

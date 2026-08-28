@@ -36,7 +36,7 @@ class DeckRepository(
 
     suspend fun deleteCard(id: Long) = cardDao.delete(id)
 
-    /** Cria carta escrita em Markdown no app. */
+    /** Creates a card authored in Markdown inside the app. */
     suspend fun addCard(deckId: Long, frontMd: String, backMd: String) {
         val now = clock.nowMillis()
         cardDao.insert(
@@ -53,8 +53,8 @@ class DeckRepository(
     }
 
     /**
-     * Salva edição preservando o modo de origem da carta:
-     * Markdown (frontSrc != null) é reconvertido; importadas são editadas como HTML cru.
+     * Saves an edit preserving how the card was authored: Markdown (frontSrc != null)
+     * is re-converted, while imported cards are edited as raw HTML.
      */
     suspend fun updateCardContent(card: Card, front: String, back: String) {
         val updated = if (card.frontSrc != null) {

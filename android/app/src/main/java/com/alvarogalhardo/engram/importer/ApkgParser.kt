@@ -7,8 +7,8 @@ import kotlinx.serialization.json.jsonObject
 import kotlinx.serialization.json.jsonPrimitive
 
 /**
- * Parser puro (sem android.*) dos JSONs do banco de coleção do Anki legado:
- * col.models, col.decks e o arquivo `media` na raiz do zip.
+ * Pure parser (no android.* dependencies) for the JSON blobs of a legacy Anki
+ * collection: col.models, col.decks, and the `media` file at the zip root.
  */
 object ApkgParser {
     data class Model(
@@ -32,14 +32,14 @@ object ApkgParser {
         }
     }
 
-    /** Nome do primeiro baralho que não seja o "Default" do Anki. */
+    /** Name of the first deck that is not Anki's "Default". */
     fun parseDeckName(json: String): String? {
         val root = Json.parseToJsonElement(json).jsonObject
         val names = root.values.mapNotNull { it.jsonObject["name"]?.jsonPrimitive?.content }
         return names.firstOrNull { it != "Default" } ?: names.firstOrNull()
     }
 
-    /** Arquivo `media`: {"0": "imagem.png", ...} — número no zip → nome original. */
+    /** The `media` file: {"0": "image.png", ...} — zip entry number → original name. */
     fun parseMediaMap(json: String): Map<String, String> {
         if (json.isBlank()) return emptyMap()
         val root = Json.parseToJsonElement(json).jsonObject

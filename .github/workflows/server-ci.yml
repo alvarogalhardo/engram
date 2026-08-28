@@ -7,7 +7,7 @@ on:
       - 'server/**'
       - 'docker-compose.yml'
       - '.github/workflows/server-ci.yml'
-  # PRs sempre rodam (sem path filter) para não travar required checks.
+  # PRs always run (no path filter) so required checks never get stuck.
   pull_request:
   workflow_dispatch:
 
@@ -55,6 +55,6 @@ jobs:
       - name: Docker build
         run: docker build -t engram-server .
 
-      - name: Compose config válido
+      - name: Compose config is valid
         working-directory: .
         run: docker compose config -q

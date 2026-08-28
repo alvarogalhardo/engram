@@ -26,6 +26,9 @@ and [CLAUDE.md](CLAUDE.md) for the rules of that contract.
 - 🚧 Everything else is an [open milestone](https://github.com/alvarogalhardo/engram/milestones) —
   that's the point.
 
+> Code, docs, and issues are in English. The app's own UI is still pt-BR only —
+> proper localization (EN + pt-BR) is milestone M8.
+
 ## Architecture
 
 ```mermaid

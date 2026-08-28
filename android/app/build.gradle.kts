@@ -20,8 +20,9 @@ android {
         versionName = "1.0.$buildVersionCode"
     }
 
-    // Keystore NUNCA entra no repo: o CI de release injeta via secrets
-    // (ENGRAM_KEYSTORE_*); sem as variáveis, release usa assinatura de debug.
+    // The keystore NEVER enters the repository: the release CI injects it via
+    // secrets (ENGRAM_KEYSTORE_*). Without those vars, release builds fall back
+    // to the debug signature so local `assembleRelease` still works.
     val keystorePath: String? = System.getenv("ENGRAM_KEYSTORE_PATH")
     signingConfigs {
         if (keystorePath != null) {

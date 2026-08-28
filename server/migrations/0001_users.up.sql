@@ -3,6 +3,6 @@ CREATE TABLE users (
     created_at timestamptz NOT NULL DEFAULT now()
 );
 
--- Usuário system único: dono de todos os dados até o M3 (contas reais).
--- O id é referenciado por store.SystemUserID.
+-- Single system user: owns all data until M3 introduces real accounts.
+-- This id is referenced by store.SystemUserID.
 INSERT INTO users (id) VALUES ('00000000-0000-0000-0000-000000000001');

@@ -8,5 +8,5 @@ data class ImportResult(
     val warnings: List<String>,
 )
 
-/** Erro de import com mensagem própria para o usuário (pt-BR). */
+/** Import failure carrying a message meant for the user (pt-BR, like the rest of the UI). */
 class ImportException(message: String) : Exception(message)
