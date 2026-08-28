@@ -1,11 +1,11 @@
 package com.alvarogalhardo.engram.importer
 
 /**
- * Converte notas do Anki em frente/verso (puro, sem android.*).
+ * Converts Anki notes into front/back pairs (pure, no android.* dependencies).
  *
- * Simplificações declaradas: 1 nota = 1 carta (templates/ords são ignorados);
- * cloze é renderizado de forma ingênua ([…] na frente, resposta em negrito no verso);
- * tags [sound:...] são removidas (sem suporte a áudio).
+ * Stated simplifications: one note = one card (templates/ords are ignored);
+ * cloze is rendered naively ([…] on the front, the answer in bold on the back);
+ * [sound:...] tags are stripped (no audio support).
  */
 object NoteConverter {
     const val FIELD_SEPARATOR = '\u001f'
@@ -40,7 +40,7 @@ object NoteConverter {
 
     fun containsCloze(flds: String): Boolean = clozeRegex.containsMatchIn(flds)
 
-    /** Aplica renomeações de mídia (colisões) nos atributos src do HTML. */
+    /** Applies media renames (collision resolution) to the HTML src attributes. */
     fun rewriteMediaRefs(html: String, renames: Map<String, String>): String {
         var result = html
         for ((old, new) in renames) {

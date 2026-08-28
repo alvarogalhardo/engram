@@ -1,6 +1,6 @@
-// Package sync abrigará a lógica de sincronização do milestone M2
-// (push LWW, pull por cursor server_seq, upload append-only de reviews).
+// Package sync will hold the synchronization logic of milestone M2
+// (LWW push, pull by server_seq cursor, append-only review upload).
 //
-// A especificação que este pacote implementa vive em docs/sync-protocol.md;
-// os testes de spec (pulados) estão em internal/api/sync_test.go.
+// The specification this package implements lives in docs/sync-protocol.md;
+// the (skipped) spec tests are in internal/api/sync_test.go.
 package sync

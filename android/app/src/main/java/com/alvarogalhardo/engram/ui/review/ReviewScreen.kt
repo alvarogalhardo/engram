@@ -75,7 +75,7 @@ class ReviewViewModel(private val c: AppContainer, private val deckId: Long) : V
         }
     }
 
-    /** Reavalia a fila (cartas em aprendizado podem ter vencido enquanto esperávamos). */
+    /** Re-evaluates the queue (learning cards may have come due while we waited). */
     fun tick() = advance()
 
     fun reveal() {
@@ -88,7 +88,7 @@ class ReviewViewModel(private val c: AppContainer, private val deckId: Long) : V
             val updated = c.studyRepo.answer(card, grade)
             val rest = queue.filter { it.id != card.id }
             queue = if (updated.state == CardState.LEARNING || updated.state == CardState.RELEARNING) {
-                rest + updated // volta pra sessão; advance() escolhe pela hora de vencimento
+                rest + updated // back into the session; advance() picks by due time
             } else {
                 rest
             }
@@ -98,7 +98,7 @@ class ReviewViewModel(private val c: AppContainer, private val deckId: Long) : V
 
     private fun advance() {
         val now = c.clock.nowMillis()
-        // Aprendizado vencido tem prioridade; depois a ordem da fila (revisões → novas).
+        // Due learning cards come first, then the queue order (reviews → new).
         val dueLearning = queue
             .filter { (it.state == CardState.LEARNING || it.state == CardState.RELEARNING) && it.dueAt <= now }
             .minByOrNull { it.dueAt }
@@ -135,7 +135,7 @@ fun ReviewScreen(deckId: Long, onBack: () -> Unit) {
         factory = viewModelFactory { initializer { ReviewViewModel(container, deckId) } },
     )
 
-    // Enquanto espera uma carta em aprendizado vencer, reavalia a cada 15 s.
+    // While waiting for a learning card to come due, re-check every 15 s.
     LaunchedEffect(vm.waitingUntil) {
         while (vm.waitingUntil != null) {
             delay(15_000)

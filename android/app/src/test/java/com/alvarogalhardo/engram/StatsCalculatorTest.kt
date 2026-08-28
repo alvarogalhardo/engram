@@ -16,7 +16,7 @@ class StatsCalculatorTest {
         ReviewSample(date.atTime(hour, 0).atZone(zone).toInstant().toEpochMilli(), grade)
 
     @Test
-    fun `streak conta dias consecutivos terminando hoje`() {
+    fun `streak counts consecutive days ending today`() {
         val samples = listOf(
             at(today), at(today, 20),
             at(today.minusDays(1)),
@@ -27,21 +27,21 @@ class StatsCalculatorTest {
     }
 
     @Test
-    fun `streak nao quebra se hoje ainda nao estudou`() {
+    fun `streak survives a today with no reviews yet`() {
         val samples = listOf(at(today.minusDays(1)), at(today.minusDays(2)))
         val r = StatsCalculator.calculate(samples, today, zone)
         assertEquals(2, r.streakDays)
     }
 
     @Test
-    fun `lacuna de um dia quebra o streak`() {
+    fun `a one day gap breaks the streak`() {
         val samples = listOf(at(today), at(today.minusDays(2)))
         val r = StatsCalculator.calculate(samples, today, zone)
         assertEquals(1, r.streakDays)
     }
 
     @Test
-    fun `acerto ignora apenas o Errei`() {
+    fun `accuracy counts everything except Again`() {
         val samples = listOf(
             at(today, grade = 2),
             at(today, grade = 0),
@@ -54,7 +54,7 @@ class StatsCalculatorTest {
     }
 
     @Test
-    fun `grafico cobre exatamente 30 dias terminando hoje`() {
+    fun `chart covers exactly 30 days ending today`() {
         val samples = listOf(at(today), at(today), at(today.minusDays(29)))
         val r = StatsCalculator.calculate(samples, today, zone)
         assertEquals(30, r.last30Days.size)
@@ -65,7 +65,7 @@ class StatsCalculatorTest {
     }
 
     @Test
-    fun `revisao fora da janela de 30 dias sai do acerto30 mas nao do geral`() {
+    fun `a review outside the 30 day window leaves accuracy30 but not the overall`() {
         val samples = listOf(at(today.minusDays(40), grade = 0), at(today, grade = 2))
         val r = StatsCalculator.calculate(samples, today, zone)
         assertEquals(1.0, r.accuracy30!!, 1e-9)
@@ -73,7 +73,7 @@ class StatsCalculatorTest {
     }
 
     @Test
-    fun `sem dados retorna zeros e nulls`() {
+    fun `no data yields zeros and nulls`() {
         val r = StatsCalculator.calculate(emptyList(), today, zone)
         assertEquals(0, r.streakDays)
         assertEquals(0, r.totalReviews)

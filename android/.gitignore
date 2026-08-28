@@ -4,7 +4,7 @@ build/
 app/build/
 .kotlin/
 
-# Config local (aponta o SDK desta máquina; CI usa ANDROID_HOME)
+# Local config (points at this machine's SDK; CI uses ANDROID_HOME)
 local.properties
 
 # IDE
@@ -15,5 +15,5 @@ captures/
 
 *.jks
 
-# gerado
+# generated
 tools/fixture.apkg

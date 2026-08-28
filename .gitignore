@@ -1,4 +1,4 @@
-# --- segredos: NUNCA commitados (sem exceções neste repo) ---
+# --- secrets: NEVER committed (no exceptions in this repo) ---
 *.jks
 *.keystore
 .env
@@ -26,7 +26,7 @@ coverage.out
 *.tfvars
 !*.auto.tfvars.example
 
-# --- IDE/SO ---
+# --- IDE / OS ---
 .idea/
 *.iml
 .vscode/

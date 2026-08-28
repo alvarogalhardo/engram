@@ -2,7 +2,7 @@ package config
 
 import "testing"
 
-// Referência de table-driven test — o formato padrão de teste em Go.
+// Reference table-driven test — the standard test shape in Go.
 func TestLoad(t *testing.T) {
 	tests := []struct {
 		name string

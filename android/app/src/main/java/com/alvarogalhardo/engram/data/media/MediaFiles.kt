@@ -9,7 +9,7 @@ import java.util.UUID
 class MediaFiles(private val context: Context) {
     val dir: File = File(context.filesDir, "media").apply { mkdirs() }
 
-    /** Copia uma imagem escolhida pelo usuário para a pasta de mídia e retorna o nome do arquivo. */
+    /** Copies a user-picked image into the media folder and returns its file name. */
     fun saveFromUri(uri: Uri): String {
         val mime = context.contentResolver.getType(uri)
         val ext = MimeTypeMap.getSingleton().getExtensionFromMimeType(mime) ?: "jpg"

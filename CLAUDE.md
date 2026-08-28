@@ -26,6 +26,15 @@ push back once (remind him of this contract), then comply if he insists.
 - Answer any question, explain any code, produce diagrams and study notes.
 - Create new well-specified issues, improve acceptance criteria, write failing tests.
 
+## Language policy
+
+- **Everything written by and for developers is in English**: code comments, KDoc
+  and Go doc comments, test names, commit messages, docs, ADRs, issues, PRs.
+- **The app's user-facing strings stay pt-BR** — that is the language of the app
+  itself, and issue "i18n: extract strings, EN + pt-BR" (M8) is what makes it
+  properly localized. Do not translate UI text or user-facing error messages
+  ahead of that issue.
+
 ## Workflow conventions
 
 - Work happens in branches + PRs; `main` is protected and requires green CI.

@@ -37,7 +37,7 @@ class Sm2SchedulerTest {
             .plusDays(days.toLong()).atStartOfDay(zone).toInstant().toEpochMilli()
 
     @Test
-    fun `review Bom multiplica pelo ease`() {
+    fun `review Good multiplies by the ease factor`() {
         val r = Sm2Scheduler.schedule(review(), Grade.GOOD, now, zone)
         assertEquals(CardState.REVIEW, r.state)
         assertEquals(25, r.intervalDays)
@@ -47,31 +47,31 @@ class Sm2SchedulerTest {
     }
 
     @Test
-    fun `review Dificil usa 1_2 e penaliza ease`() {
+    fun `review Hard uses 1_2 and penalises the ease`() {
         val r = Sm2Scheduler.schedule(review(), Grade.HARD, now, zone)
         assertEquals(12, r.intervalDays)
         assertEquals(2350, r.easeFactor)
     }
 
     @Test
-    fun `review Facil aplica bonus e aumenta ease`() {
+    fun `review Easy applies the bonus and raises the ease`() {
         val r = Sm2Scheduler.schedule(review(), Grade.EASY, now, zone)
         assertEquals(33, r.intervalDays) // 10 * 2.5 * 1.3 = 32.5 → 33
         assertEquals(2650, r.easeFactor)
     }
 
     @Test
-    fun `review Errei vira relearning com intervalo pela metade`() {
+    fun `review Again goes to relearning with a halved interval`() {
         val r = Sm2Scheduler.schedule(review(), Grade.AGAIN, now, zone)
         assertEquals(CardState.RELEARNING, r.state)
         assertEquals(2300, r.easeFactor)
-        assertEquals(5, r.intervalDays) // guardado para a re-graduação
+        assertEquals(5, r.intervalDays) // stored for the re-graduation
         assertEquals(1, r.lapses)
         assertEquals(now + 10 * 60_000L, r.dueAt)
     }
 
     @Test
-    fun `relearning Bom re-gradua com o intervalo guardado`() {
+    fun `relearning Good re-graduates with the stored interval`() {
         val relearning = review(interval = 5, ease = 2300).copy(state = CardState.RELEARNING)
         val r = Sm2Scheduler.schedule(relearning, Grade.GOOD, now, zone)
         assertEquals(CardState.REVIEW, r.state)
@@ -80,7 +80,7 @@ class Sm2SchedulerTest {
     }
 
     @Test
-    fun `carta nova Bom avanca para o passo de 10 min`() {
+    fun `new card Good advances to the 10 min step`() {
         val r = Sm2Scheduler.schedule(newCard(), Grade.GOOD, now, zone)
         assertEquals(CardState.LEARNING, r.state)
         assertEquals(1, r.stepIndex)
@@ -88,7 +88,7 @@ class Sm2SchedulerTest {
     }
 
     @Test
-    fun `learning no ultimo passo Bom gradua com 1 dia`() {
+    fun `learning on the last step Good graduates with 1 day`() {
         val learning = newCard().copy(state = CardState.LEARNING, stepIndex = 1)
         val r = Sm2Scheduler.schedule(learning, Grade.GOOD, now, zone)
         assertEquals(CardState.REVIEW, r.state)
@@ -97,7 +97,7 @@ class Sm2SchedulerTest {
     }
 
     @Test
-    fun `carta nova Facil gradua direto com 4 dias`() {
+    fun `new card Easy graduates straight to 4 days`() {
         val r = Sm2Scheduler.schedule(newCard(), Grade.EASY, now, zone)
         assertEquals(CardState.REVIEW, r.state)
         assertEquals(4, r.intervalDays)
@@ -105,7 +105,7 @@ class Sm2SchedulerTest {
     }
 
     @Test
-    fun `carta nova Errei volta ao passo de 1 min`() {
+    fun `new card Again returns to the 1 min step`() {
         val r = Sm2Scheduler.schedule(newCard(), Grade.AGAIN, now, zone)
         assertEquals(CardState.LEARNING, r.state)
         assertEquals(0, r.stepIndex)
@@ -113,20 +113,20 @@ class Sm2SchedulerTest {
     }
 
     @Test
-    fun `ease nunca cai abaixo do piso`() {
+    fun `ease never drops below the floor`() {
         val r = Sm2Scheduler.schedule(review(ease = 1300), Grade.HARD, now, zone)
         assertEquals(1300, r.easeFactor)
         assertEquals(12, r.intervalDays)
     }
 
     @Test
-    fun `intervalo sempre cresce pelo menos 1 dia em revisao`() {
+    fun `a review interval always grows by at least 1 day`() {
         val r = Sm2Scheduler.schedule(review(interval = 1, ease = 1300), Grade.GOOD, now, zone)
         assertEquals(2, r.intervalDays) // max(1+1, round(1*1.3)=1)
     }
 
     @Test
-    fun `preview mostra rotulos de minutos e dias`() {
+    fun `preview shows minute and day labels`() {
         val p = Sm2Scheduler.preview(newCard(), now, zone)
         assertEquals("1 min", p[Grade.AGAIN])
         assertEquals("10 min", p[Grade.GOOD])

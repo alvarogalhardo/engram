@@ -1,6 +1,6 @@
 package com.alvarogalhardo.engram.domain.scheduler
 
-/** Estado de agendamento de uma carta, desacoplado da entidade Room. */
+/** A card's scheduling state, decoupled from the Room entity. */
 data class SchedulingState(
     val state: Int,
     val stepIndex: Int,

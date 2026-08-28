@@ -20,10 +20,10 @@ jobs:
 
       - uses: gradle/actions/setup-gradle@v4
 
-      - name: Keystore a partir dos secrets
+      - name: Restore keystore from secrets
         run: echo "${{ secrets.ANDROID_KEYSTORE_BASE64 }}" | base64 -d > "$RUNNER_TEMP/release.jks"
 
-      - name: Testes + APK release assinado
+      - name: Unit tests + signed release APK
         working-directory: android
         env:
           ENGRAM_KEYSTORE_PATH: ${{ runner.temp }}/release.jks
@@ -32,7 +32,7 @@ jobs:
           ENGRAM_KEY_PASSWORD: ${{ secrets.ANDROID_KEY_PASSWORD }}
         run: ./gradlew --no-daemon test assembleRelease -PversionCode=${{ github.run_number }}
 
-      - name: Renomear APK
+      - name: Rename APK
         run: cp android/app/build/outputs/apk/release/app-release.apk engram-${{ github.ref_name }}.apk
 
       - uses: softprops/action-gh-release@v2

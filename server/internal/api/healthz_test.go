@@ -8,7 +8,7 @@ import (
 	"github.com/alvarogalhardo/engram/server/internal/config"
 )
 
-// Referência de teste de handler com httptest.
+// Reference handler test using httptest.
 func TestHealthzWithoutDatabase(t *testing.T) {
 	srv := New(config.Config{Port: "8080", APIToken: "t"}, nil)
 

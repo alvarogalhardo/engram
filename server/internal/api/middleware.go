@@ -6,8 +6,8 @@ import (
 	"time"
 )
 
-// withLogging é a referência de como middleware funciona na stdlib:
-// uma função que recebe um Handler e devolve outro.
+// withLogging is the reference for how middleware works in the stdlib:
+// a function that takes a Handler and returns another one.
 func withLogging(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		start := time.Now()

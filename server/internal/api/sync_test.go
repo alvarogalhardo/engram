@@ -5,8 +5,8 @@ import (
 	"testing"
 )
 
-// Spec do milestone M2 — docs/sync-protocol.md §4–§6.
-// Cada bloco de testes corresponde a uma issue (push / pull / reviews).
+// Spec for milestone M2 — docs/sync-protocol.md §4–§6.
+// Each block of tests maps to one issue (push / pull / reviews).
 
 type pushResponse struct {
 	Applied int      `json:"applied"`
@@ -30,10 +30,10 @@ func pushDeck(id string, name string, updatedAt int64, deleted bool) map[string]
 
 const deckA = "11111111-1111-1111-1111-111111111111"
 
-// --- issue M2: POST /v1/sync/push ---
+// --- M2 issue: POST /v1/sync/push ---
 
 func TestPushCreatesAndIsIdempotent(t *testing.T) {
-	t.Skip("un-skip na issue M2: sync push (docs/roadmap.md)")
+	t.Skip("un-skip in M2 issue: sync push (docs/roadmap.md)")
 	s := newSpecServer(t)
 
 	rec := doJSON(t, s, "POST", "/v1/sync/push", specToken, pushDeck(deckA, "Go", 1000, false))
@@ -42,41 +42,41 @@ func TestPushCreatesAndIsIdempotent(t *testing.T) {
 		t.Fatalf("applied = %d, want 1", r.Applied)
 	}
 
-	// Retry idêntico (mesmo updatedAt): não pode duplicar nem falhar.
+	// Identical retry (same updatedAt): must be safe and must not duplicate.
 	rec = doJSON(t, s, "POST", "/v1/sync/push", specToken, pushDeck(deckA, "Go", 1000, false))
 	wantStatus(t, rec, 200)
 	if r := decode[pushResponse](t, rec); r.Applied != 0 {
-		t.Fatalf("retry aplicou de novo: %+v (LWW usa 'estritamente maior')", r)
+		t.Fatalf("retry applied again: %+v (LWW compares strictly greater)", r)
 	}
 }
 
 func TestPushLastWriteWins(t *testing.T) {
-	t.Skip("un-skip na issue M2: sync push (docs/roadmap.md)")
+	t.Skip("un-skip in M2 issue: sync push (docs/roadmap.md)")
 	s := newSpecServer(t)
 
-	doJSON(t, s, "POST", "/v1/sync/push", specToken, pushDeck(deckA, "nova", 2000, false))
+	doJSON(t, s, "POST", "/v1/sync/push", specToken, pushDeck(deckA, "newer", 2000, false))
 
-	// Escrita mais velha chega DEPOIS (device com relógio atrasado / sync tardio):
-	// deve ser rejeitada e reportada em stale — é o caso de clock skew do LWW.
-	rec := doJSON(t, s, "POST", "/v1/sync/push", specToken, pushDeck(deckA, "velha", 1500, false))
+	// An older write arrives LATER (device with a lagging clock, or a late sync):
+	// it must be rejected and reported as stale — this is the LWW clock-skew case.
+	rec := doJSON(t, s, "POST", "/v1/sync/push", specToken, pushDeck(deckA, "older", 1500, false))
 	r := decode[pushResponse](t, rec)
 	if r.Applied != 0 || len(r.Stale) != 1 || r.Stale[0] != deckA {
-		t.Fatalf("escrita velha deveria ser stale: %+v", r)
+		t.Fatalf("the older write should be stale: %+v", r)
 	}
 }
 
 func TestPushPropagatesTombstone(t *testing.T) {
-	t.Skip("un-skip na issue M2: sync push (docs/roadmap.md)")
+	t.Skip("un-skip in M2 issue: sync push (docs/roadmap.md)")
 	s := newSpecServer(t)
 	doJSON(t, s, "POST", "/v1/sync/push", specToken, pushDeck(deckA, "Go", 1000, false))
 	doJSON(t, s, "POST", "/v1/sync/push", specToken, pushDeck(deckA, "Go", 2000, true))
 	wantStatus(t, doJSON(t, s, "GET", "/v1/decks/"+deckA, specToken, nil), 404)
 }
 
-// --- issue M2: GET /v1/sync/pull ---
+// --- M2 issue: GET /v1/sync/pull ---
 
 func TestPullCursorAndPagination(t *testing.T) {
-	t.Skip("un-skip na issue M2: sync pull (docs/roadmap.md)")
+	t.Skip("un-skip in M2 issue: sync pull (docs/roadmap.md)")
 	s := newSpecServer(t)
 
 	for i := 0; i < 3; i++ {
@@ -84,45 +84,45 @@ func TestPullCursorAndPagination(t *testing.T) {
 		doJSON(t, s, "POST", "/v1/sync/push", specToken, pushDeck(id, fmt.Sprintf("d%d", i), int64(1000+i), false))
 	}
 
-	// Primeira página.
+	// First page.
 	rec := doJSON(t, s, "GET", "/v1/sync/pull?since=0&limit=2", specToken, nil)
 	wantStatus(t, rec, 200)
 	p1 := decode[pullResponse](t, rec)
 	if len(p1.Decks) != 2 || !p1.HasMore {
-		t.Fatalf("page1 = %+v, want 2 decks e hasMore", p1)
+		t.Fatalf("page1 = %+v, want 2 decks and hasMore", p1)
 	}
 
-	// Segunda página a partir do cursor.
+	// Second page, starting from the returned cursor.
 	p2 := decode[pullResponse](t, doJSON(t, s, "GET",
 		fmt.Sprintf("/v1/sync/pull?since=%d&limit=2", p1.Next), specToken, nil))
 	if len(p2.Decks) != 1 || p2.HasMore {
-		t.Fatalf("page2 = %+v, want 1 deck e fim", p2)
+		t.Fatalf("page2 = %+v, want 1 deck and no more", p2)
 	}
 
-	// Cursor no fim: pull vazio (nada novo).
+	// Cursor at the end: pull is empty (nothing new).
 	p3 := decode[pullResponse](t, doJSON(t, s, "GET",
 		fmt.Sprintf("/v1/sync/pull?since=%d", p2.Next), specToken, nil))
 	if len(p3.Decks) != 0 {
-		t.Fatalf("pull no cursor final deveria ser vazio: %+v", p3)
+		t.Fatalf("pull at the final cursor should be empty: %+v", p3)
 	}
 }
 
 func TestPullIncludesTombstones(t *testing.T) {
-	t.Skip("un-skip na issue M2: sync pull (docs/roadmap.md)")
+	t.Skip("un-skip in M2 issue: sync pull (docs/roadmap.md)")
 	s := newSpecServer(t)
 	doJSON(t, s, "POST", "/v1/sync/push", specToken, pushDeck(deckA, "Go", 1000, false))
 	doJSON(t, s, "POST", "/v1/sync/push", specToken, pushDeck(deckA, "Go", 2000, true))
 
 	p := decode[pullResponse](t, doJSON(t, s, "GET", "/v1/sync/pull?since=0", specToken, nil))
 	if len(p.Decks) != 1 || !p.Decks[0].Deleted {
-		t.Fatalf("pull deve entregar o tombstone para o outro device apagar: %+v", p)
+		t.Fatalf("pull must deliver the tombstone so the other device can delete: %+v", p)
 	}
 }
 
-// --- issue M2: POST /v1/sync/reviews ---
+// --- M2 issue: POST /v1/sync/reviews ---
 
 func TestReviewUploadDeduplicates(t *testing.T) {
-	t.Skip("un-skip na issue M2: review upload (docs/roadmap.md)")
+	t.Skip("un-skip in M2 issue: review upload (docs/roadmap.md)")
 	s := newSpecServer(t)
 	doJSON(t, s, "POST", "/v1/sync/push", specToken, pushDeck(deckA, "Go", 1000, false))
 
@@ -142,8 +142,9 @@ func TestReviewUploadDeduplicates(t *testing.T) {
 	}}}
 
 	wantStatus(t, doJSON(t, s, "POST", "/v1/sync/reviews", specToken, review), 200)
-	// Reenvio do mesmo evento (retry de rede): silenciosamente ignorado.
+	// Re-sending the same event (network retry): silently ignored.
 	wantStatus(t, doJSON(t, s, "POST", "/v1/sync/reviews", specToken, review), 200)
-	// A contagem no banco deve ser 1 — verifique via query no seu teste se quiser
-	// ir além; o contrato mínimo é o retry não falhar nem duplicar efeitos.
+	// The row count in the database must stay at 1 — query it in your own test
+	// if you want to go further; the minimum contract is that the retry neither
+	// fails nor duplicates effects.
 }

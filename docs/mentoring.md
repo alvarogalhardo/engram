@@ -10,7 +10,7 @@ marked with a skip that names its issue:
 
 ```go
 func TestDeckCreateAndGet(t *testing.T) {
-    t.Skip("un-skip na issue M1: Decks CRUD (docs/roadmap.md)")
+    t.Skip("un-skip in M1 issue: decks CRUD (docs/roadmap.md)")
     ...
 }
 ```

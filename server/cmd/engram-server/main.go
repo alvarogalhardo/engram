@@ -1,5 +1,5 @@
-// engram-server é o servidor de sync do engram: expõe a API HTTP, aplica as
-// migrations no startup e sobe em modo degradado quando o banco está fora.
+// engram-server is the engram sync server: it exposes the HTTP API, applies
+// migrations on startup, and boots in degraded mode when the database is down.
 package main
 
 import (
@@ -30,8 +30,8 @@ func run() error {
 	ctx, stop := signal.NotifyContext(context.Background(), syscall.SIGINT, syscall.SIGTERM)
 	defer stop()
 
-	// Sem DATABASE_URL (ou banco fora do ar) o servidor sobe em modo degradado:
-	// /healthz responde com db=down e os endpoints de dados retornarão 503.
+	// Without DATABASE_URL (or with the database down) the server boots degraded:
+	// /healthz answers db=down and the data endpoints will return 503.
 	var st *store.Store
 	if cfg.DatabaseURL != "" {
 		var err error
